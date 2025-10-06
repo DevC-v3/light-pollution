@@ -6,13 +6,13 @@ import random
 
 app = Flask(__name__)
 
-# Configuración NASA
-NASA_API_KEY = os.getenv('NASA_API_KEY', 'nv2TdFRdjC51V8fgzF2Ti0uIwm9YrI3A7ZawqfVW')  # Usa tu API key real
+# NASA Configuration
+NASA_API_KEY = os.getenv('NASA_API_KEY', 'nv2TdFRdjC51V8fgzF2Ti0uIwm9YrI3A7ZawqfVW')  # Use your real API key
 
-# Datos de ciudades
+# Cities data
 PERU_CITIES = {
     "lima": {
-        "name": "Lima Metropolitana",
+        "name": "Metropolitan Lima",
         "coords": [-12.0464, -77.0428],
         "population": 11000000,
         "region": "Lima"
@@ -59,7 +59,7 @@ def get_nasa_apod():
     return {'success': False}
 
 def get_nasa_events():
-    """Eventos en tiempo real de NASA EONET"""
+    """Real-time events from NASA EONET"""
     try:
         url = "https://eonet.gsfc.nasa.gov/api/v3/events"
         params = {'limit': 5, 'days': 30}
@@ -78,7 +78,7 @@ def get_nasa_events():
     return []
 
 def get_earth_imagery(city_coords):
-    """Imagen satelital de la ciudad"""
+    """Satellite imagery of the city"""
     try:
         url = "https://api.nasa.gov/planetary/earth/imagery"
         params = {
@@ -98,7 +98,7 @@ def get_earth_imagery(city_coords):
     return {'available': False}
 
 def get_asteroid_data():
-    """Datos de asteroides cercanos"""
+    """Near-Earth asteroid data"""
     try:
         today = datetime.now().strftime('%Y-%m-%d')
         url = f"https://api.nasa.gov/neo/rest/v1/feed"
@@ -124,16 +124,16 @@ def get_asteroid_data():
     return {'success': False, 'count': 0}
 
 def get_mars_weather():
-    """Datos del clima en Marte (simulados)"""
+    """Mars weather data (simulated)"""
     return {
         'temp': random.randint(-80, -20),
-        'season': random.choice(['Primavera', 'Verano', 'Otoño', 'Invierno']),
+        'season': random.choice(['Spring', 'Summer', 'Fall', 'Winter']),
         'pressure': random.randint(600, 900),
         'success': True
     }
 
 def calculate_pollution_from_nasa(city_id, nasa_events):
-    """Calcular contaminación basada en datos NASA reales"""
+    """Calculate pollution based on real NASA data"""
     base_data = {
         "lima": {"base": 0.65, "growth": 0.04},
         "huanuco": {"base": 0.38, "growth": 0.01},
@@ -143,7 +143,7 @@ def calculate_pollution_from_nasa(city_id, nasa_events):
     
     base = base_data.get(city_id, {"base": 0.5, "growth": 0.02})
     
-    # Impacto de eventos NASA reales
+    # Impact from real NASA events
     event_impact = len(nasa_events) * 0.015
     weather_impact = random.uniform(-0.03, 0.03)
     
@@ -155,12 +155,12 @@ def calculate_pollution_from_nasa(city_id, nasa_events):
 
 @app.route('/')
 def index():
-    """Página principal"""
+    """Main page"""
     return render_template('index.html')
 
 @app.route('/api/status')
 def api_status():
-    """Estado de todas las APIs NASA"""
+    """Status of all NASA APIs"""
     nasa_events = get_nasa_events()
     apod_data = get_nasa_apod()
     asteroid_data = get_asteroid_data()
@@ -183,22 +183,22 @@ def api_status():
 
 @app.route('/api/cities')
 def get_cities():
-    """Lista de ciudades con datos NASA"""
+    """List of cities with NASA data"""
     nasa_events = get_nasa_events()
     
     cities_data = []
     for city_id, city_info in PERU_CITIES.items():
         blue_ratio, orange_ratio = calculate_pollution_from_nasa(city_id, nasa_events)
         
-        # Determinar estado
+        # Determine status
         if blue_ratio > 0.6:
-            status = "CRÍTICO"
+            status = "CRITICAL"
             score = random.randint(20, 40)
         elif blue_ratio > 0.45:
-            status = "MODERADO"
+            status = "MODERATE"
             score = random.randint(41, 69)
         else:
-            status = "SALUDABLE"
+            status = "HEALTHY"
             score = random.randint(70, 85)
             
         cities_data.append({
@@ -214,9 +214,9 @@ def get_cities():
 
 @app.route('/api/analyze/<city_id>')
 def analyze_city(city_id):
-    """Análisis completo de una ciudad"""
+    """Complete analysis of a city"""
     if city_id not in PERU_CITIES:
-        return jsonify({'error': 'Ciudad no encontrada'}), 404
+        return jsonify({'error': 'City not found'}), 404
     
     city_data = PERU_CITIES[city_id]
     nasa_events = get_nasa_events()
@@ -225,18 +225,18 @@ def analyze_city(city_id):
     asteroid_data = get_asteroid_data()
     mars_weather = get_mars_weather()
     
-    # Calcular contaminación
+    # Calculate pollution
     blue_ratio, orange_ratio = calculate_pollution_from_nasa(city_id, nasa_events)
     
-    # Determinar estado
+    # Determine status
     if blue_ratio > 0.6:
-        status = "CRÍTICO"
+        status = "CRITICAL"
         health_score = random.randint(20, 40)
     elif blue_ratio > 0.45:
-        status = "MODERADO"
+        status = "MODERATE"
         health_score = random.randint(41, 69)
     else:
-        status = "SALUDABLE"
+        status = "HEALTHY"
         health_score = random.randint(70, 85)
     
     return jsonify({
@@ -245,7 +245,7 @@ def analyze_city(city_id):
             'region': city_data['region'],
             'population': city_data['population'],
             'coordinates': city_data['coords'],
-            'description': f"Monitoreo de contaminación lumínica en {city_data['name']}"
+            'description': f"Light pollution monitoring in {city_data['name']}"
         },
         'pollution_analysis': {
             'status': status,
@@ -266,7 +266,7 @@ def analyze_city(city_id):
     })
 
 def generate_historical_data(city_id, current_blue, current_orange):
-    """Generar datos históricos"""
+    """Generate historical data"""
     years = [2020, 2021, 2022, 2023]
     history = []
     
@@ -291,42 +291,42 @@ def generate_historical_data(city_id, current_blue, current_orange):
     return history
 
 def generate_recommendations(status, city_name):
-    """Generar recomendaciones basadas en NASA"""
-    if status == "CRÍTICO":
+    """Generate recommendations based on NASA"""
+    if status == "CRITICAL":
         return [
-            f"URGENTE: Reemplazar 50% de LED azules en {city_name}",
-            "Implementar norma técnica NASA-compatible",
-            "Crear zonas de protección de cielo oscuro",
-            "Sistema de monitoreo continuo con datos satelitales"
+            f"URGENT: Replace 50% of blue LEDs in {city_name}",
+            "Implement NASA-compatible technical standards",
+            "Create dark sky protection zones",
+            "Continuous monitoring system with satellite data"
         ]
-    elif status == "MODERADO":
+    elif status == "MODERATE":
         return [
-            f"Plan de transición a LED NASA-recomendados en {city_name}",
-            "Monitoreo mensual con Earth Imagery API",
-            "Educación sobre estándares internacionales",
-            "Participar en programa NASA 'Dark Sky Cities'"
+            f"Transition plan to NASA-recommended LEDs in {city_name}",
+            "Monthly monitoring with Earth Imagery API",
+            "Education on international standards",
+            "Participate in NASA 'Dark Sky Cities' program"
         ]
     else:
         return [
-            f"¡Excelente! {city_name} cumple estándares NASA",
-            "Mantener certificación 'NASA Dark Sky Friendly'",
-            "Compartir prácticas con Red Global NASA",
-            "Implementar observatorio ciudadano"
+            f"Excellent! {city_name} meets NASA standards",
+            "Maintain 'NASA Dark Sky Friendly' certification",
+            "Share practices with NASA Global Network",
+            "Implement citizen observatory"
         ]
 
 @app.route('/api/nasa/apod')
 def nasa_apod():
-    """API solo para APOD"""
+    """APOD-only API"""
     return jsonify(get_nasa_apod())
 
 @app.route('/api/nasa/events')
 def nasa_events():
-    """API solo para eventos"""
+    """Events-only API"""
     return jsonify(get_nasa_events())
 
 @app.route('/api/nasa/asteroids')
 def nasa_asteroids():
-    """API solo para asteroides"""
+    """Asteroids-only API"""
     return jsonify(get_asteroid_data())
 
 if __name__ == '__main__':
